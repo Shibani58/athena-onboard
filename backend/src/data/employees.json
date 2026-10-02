@@ -1,0 +1,8 @@
+[
+  {"employeeId": "EMP1001", "name": "Aisha Khan", "email": "aisha.khan@example.com", "role": "Backend Software Engineer", "team": "Platform Engineering", "manager": "Rohan Iyer", "location": "Bangalore", "startDate": "2026-11-02", "skills": ["Java", "Spring Boot", "SQL"]},
+  {"employeeId": "EMP1002", "name": "Daniel Ortiz", "email": "daniel.ortiz@example.com", "role": "Data Analyst", "team": "Finance Analytics", "manager": "Meera Nair", "location": "Pune", "startDate": "2026-11-09", "skills": ["Excel", "SQL", "Power BI"]},
+  {"employeeId": "EMP1003", "name": "Priya Raman", "email": "priya.raman@example.com", "role": "Field Service Engineer", "team": "Field Operations", "manager": "Karan Mehta", "location": "Chennai", "startDate": "2026-11-02", "skills": ["Mechanical maintenance", "Diagnostics"]},
+  {"employeeId": "EMP1004", "name": "Liam Chen", "email": "liam.chen@example.com", "role": "Frontend Developer", "team": "Digital Products", "manager": "Sara Thomas", "location": "Hyderabad", "startDate": "2026-11-16", "skills": ["Angular", "TypeScript", "CSS"]},
+  {"employeeId": "EMP1005", "name": "Neha Verma", "email": "neha.verma@example.com", "role": "HR Business Partner", "team": "People & Culture", "manager": "Anil Kapoor", "location": "Bangalore", "startDate": "2026-11-23", "skills": ["Talent management", "Employee relations"]},
+  {"employeeId": "EMP1006", "name": "Omar Haddad", "email": "omar.haddad@example.com", "role": "Cloud DevOps Engineer", "team": "Platform Engineering", "manager": "Rohan Iyer", "location": "Remote", "startDate": "2026-11-09", "skills": ["AWS", "Terraform", "CI/CD"]}
+]

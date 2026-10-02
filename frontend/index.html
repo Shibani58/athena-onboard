@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Athena Onboard — AI onboarding plans</title>
+  <meta name="description" content="Enter an employee ID, generate a personalised 3-week onboarding plan with AI, review it as HR and email it to the new joiner.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="top">
+    <div class="brand"><span class="logo">A</span> Athena Onboard</div>
+    <span class="mode" id="mode"></span>
+  </header>
+
+  <main class="wrap">
+    <section class="intro">
+      <h1>Onboarding plans in one click</h1>
+      <p>Enter a new joiner's employee ID. Athena fetches their profile, picks the most relevant training with embeddings and cosine similarity, drafts a 3-week plan with an LLM, and waits for HR approval before emailing it.</p>
+      <ol class="steps" id="steps">
+        <li data-step="fetch">Fetch</li><li data-step="plan">Plan</li><li data-step="review">Review</li><li data-step="email">Email</li>
+      </ol>
+    </section>
+
+    <section class="card">
+      <form id="lookup" class="lookup">
+        <label for="empId">Employee ID</label>
+        <div class="row">
+          <input id="empId" name="empId" placeholder="e.g. EMP1001" autocomplete="off" required>
+          <button class="btn primary" type="submit" id="genBtn">Generate plan</button>
+        </div>
+        <p class="hint">Try <button type="button" class="chip" data-id="EMP1001">EMP1001</button><button type="button" class="chip" data-id="EMP1002">EMP1002</button><button type="button" class="chip" data-id="EMP1003">EMP1003</button><button type="button" class="chip" data-id="EMP1004">EMP1004</button><button type="button" class="chip" data-id="EMP1006">EMP1006</button> (synthetic employees)</p>
+      </form>
+      <p class="status" id="status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="card hidden" id="employeeCard"></section>
+    <section class="card hidden" id="planCard"></section>
+    <section class="card hidden" id="emailCard"></section>
+    <section class="card hidden" id="auditCard"></section>
+  </main>
+
+  <footer class="foot">
+    Demo rebuild of a hackathon project · AWS Lambda + API Gateway + DynamoDB + SES · Gemini (free tier) instead of Amazon Bedrock Titan · all data is synthetic
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="mock-api.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

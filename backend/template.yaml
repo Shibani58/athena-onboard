@@ -1,0 +1,109 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Athena Onboard (demo rebuild) - AI-generated, HR-reviewed onboarding plans on AWS Lambda.
+
+Parameters:
+  GeminiApiKey:
+    Type: String
+    NoEcho: true
+    Default: ""
+    Description: Google Gemini API key (free tier). Leave empty to use the built-in template planner.
+  SenderEmail:
+    Type: String
+    Default: ""
+    Description: SES-verified sender address. Leave empty to return an email preview instead of sending.
+  AllowedOrigin:
+    Type: String
+    Default: "*"
+    Description: Origin allowed to call the API (e.g. https://shibani58.github.io).
+
+Globals:
+  Function:
+    Runtime: python3.12
+    CodeUri: src/
+    Timeout: 29
+    MemorySize: 256
+    Architectures: [arm64]
+    Environment:
+      Variables:
+        PLANS_TABLE: !Ref PlansTable
+        GEMINI_API_KEY: !Ref GeminiApiKey
+        SENDER_EMAIL: !Ref SenderEmail
+        ALLOWED_ORIGIN: !Ref AllowedOrigin
+
+Resources:
+  Api:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      CorsConfiguration:
+        AllowOrigins: [!Ref AllowedOrigin]
+        AllowMethods: [GET, POST, PUT, OPTIONS]
+        AllowHeaders: [content-type]
+      DefaultRouteSettings:
+        ThrottlingBurstLimit: 5
+        ThrottlingRateLimit: 2
+
+  PlansTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - { AttributeName: planId, AttributeType: S }
+      KeySchema:
+        - { AttributeName: planId, KeyType: HASH }
+
+  GetEmployeeDetailsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-get-employee-details"
+      Handler: get_employee_details.handler
+      Events:
+        GetEmployee:
+          Type: HttpApi
+          Properties: { ApiId: !Ref Api, Path: /employees/{employeeId}, Method: GET }
+
+  GeneratePlanFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-generate-plan"
+      Handler: generate_plan.handler
+      ReservedConcurrentExecutions: 2
+      Policies:
+        - DynamoDBCrudPolicy: { TableName: !Ref PlansTable }
+      Events:
+        Generate:
+          Type: HttpApi
+          Properties: { ApiId: !Ref Api, Path: /plans, Method: POST }
+
+  ReviewPlanFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-review-plan"
+      Handler: review_plan.handler
+      Policies:
+        - DynamoDBCrudPolicy: { TableName: !Ref PlansTable }
+      Events:
+        GetPlan:
+          Type: HttpApi
+          Properties: { ApiId: !Ref Api, Path: /plans/{planId}, Method: GET }
+        ReviewPlan:
+          Type: HttpApi
+          Properties: { ApiId: !Ref Api, Path: /plans/{planId}, Method: PUT }
+
+  SendEmailFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-send-email"
+      Handler: send_email.handler
+      Policies:
+        - DynamoDBCrudPolicy: { TableName: !Ref PlansTable }
+        - SESCrudPolicy: { IdentityName: "*" }
+      Events:
+        Send:
+          Type: HttpApi
+          Properties: { ApiId: !Ref Api, Path: /plans/{planId}/send, Method: POST }
+
+Outputs:
+  ApiUrl:
+    Description: Base URL to put in frontend/config.js
+    Value: !Sub "https://${Api}.execute-api.${AWS::Region}.amazonaws.com"
